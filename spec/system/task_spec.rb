@@ -18,12 +18,13 @@ RSpec.describe 'Task', type: :system do
         project = FactoryBot.create(:project)
         task = FactoryBot.create(:task, project_id: project.id)
         visit project_path(project)
-        # project.idを引数としてわたしたが、うまく行かなかった ArgumentError:
-        #click_link('View Todos', project_id: project.id)
-        visit "projects/#{project.id}/tasks"
-        expect(page).to have_content task.title
-        expect(Task.count).to eq 1
-        expect(current_path).to eq project_tasks_path(project)
+        # リンクが新しいタブを開くため、テストを実行するタブを切り替える
+        new_window = window_opened_by { click_link 'View Todos' }
+        within_window new_window do
+          expect(page).to have_content task.title
+          expect(Task.count).to eq 1
+          expect(current_path).to eq project_tasks_path(project)
+        end
       end
     end
   end
@@ -61,15 +62,18 @@ RSpec.describe 'Task', type: :system do
 
   describe 'Task編集' do
     context '正常系' do
-      xit 'Taskを編集した場合、一覧画面で編集後の内容が表示されること' do
-        # FIXME: テストが失敗するので修正してください
+      xit 'Taskを編集した場合、一覧画面で編集後の内容が表示されること', :focus => true do
+        # FIXME: テストが失敗するので修正してください 
         project = FactoryBot.create(:project)
         task = FactoryBot.create(:task, project_id: project.id)
         visit edit_project_task_path(project, task)
         fill_in 'Deadline', with: Time.current
         click_button 'Update Task'
-        click_link 'Back'
-        expect(find('.task_list')).to have_content(Time.current.strftime('%Y-%m-%d'))
+        byebug
+        #click_link 'Back'
+        #click_link "/projects/#{project.id}/tasks"
+        save_and_open_page
+        expect(find('#task_list')).to have_content(Time.current.strftime('%Y-%m-%d'))
         expect(current_path).to eq project_tasks_path(project)
       end
 
