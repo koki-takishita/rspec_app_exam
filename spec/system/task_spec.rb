@@ -1,10 +1,10 @@
 require 'rails_helper'
 
 RSpec.describe 'Task', type: :system do
-  describe 'Task一覧' do
-    context '正常系' do
       let(:project) { create(:project) }
       let(:task) { create(:task, project_id: project.id) }
+  describe 'Task一覧' do
+    context '正常系' do
       it '一覧ページにアクセスした場合、Taskが表示されること' do
         # TODO: ローカル変数ではなく let を使用してください
         visit project_tasks_path(project)
@@ -47,8 +47,6 @@ RSpec.describe 'Task', type: :system do
     context '正常系' do
       it 'Taskが表示されること' do
         # TODO: ローカル変数ではなく let を使用してください
-        project = FactoryBot.create(:project)
-        task = FactoryBot.create(:task, project_id: project.id)
         visit project_task_path(project, task)
         expect(page).to have_content(task.title)
         expect(page).to have_content(task.status)
@@ -62,8 +60,6 @@ RSpec.describe 'Task', type: :system do
     context '正常系' do
       it 'Taskを編集した場合、一覧画面で編集後の内容が表示されること' do
         # FIXME: テストが失敗するので修正してください 
-        project = FactoryBot.create(:project)
-        task = FactoryBot.create(:task, project_id: project.id)
         visit edit_project_task_path(project, task)
         fill_in 'Deadline', with: Time.current
         click_button 'Update Task'
@@ -74,8 +70,6 @@ RSpec.describe 'Task', type: :system do
 
       it 'ステータスを完了にした場合、Taskの完了日に今日の日付が登録されること' do
         # TODO: ローカル変数ではなく let を使用してください
-        project = FactoryBot.create(:project)
-        task = FactoryBot.create(:task, project_id: project.id)
         visit edit_project_task_path(project, task)
         select 'done', from: 'Status'
         click_button 'Update Task'
@@ -86,14 +80,13 @@ RSpec.describe 'Task', type: :system do
 
       it '既にステータスが完了のタスクのステータスを変更した場合、Taskの完了日が更新されないこと' do
         # TODO: FactoryBotのtraitを利用してください
-        project = FactoryBot.create(:project)
-        task = FactoryBot.create(:task, project_id: project.id, status: :done, completion_date: Time.current.yesterday)
-        visit edit_project_task_path(project, task)
+        done_task = create(:task, :status_due, project_id: project.id)
+        visit edit_project_task_path(project, done_task)
         select 'todo', from: 'Status'
         click_button 'Update Task'
         expect(page).to have_content('todo')
         expect(page).not_to have_content(Time.current.strftime('%Y-%m-%d'))
-        expect(current_path).to eq project_task_path(project, task)
+        expect(current_path).to eq project_task_path(project, done_task)
       end
     end
   end
@@ -102,8 +95,9 @@ RSpec.describe 'Task', type: :system do
     context '正常系' do
       # FIXME: テストが失敗するので修正してください
       it 'Taskが削除されること' do
-        project = FactoryBot.create(:project)
-        task = FactoryBot.create(:task, project_id: project.id)
+        # 変数に入れないと expectのコードで再度作成されてしまうため
+        project = create(:project)
+        task = create(:task, project_id: project.id)
         visit project_tasks_path(project)
         # 確認タイアログを実行するコード
         accept_confirm do
