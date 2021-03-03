@@ -62,16 +62,14 @@ RSpec.describe 'Task', type: :system do
 
   describe 'Task編集' do
     context '正常系' do
-      xit 'Taskを編集した場合、一覧画面で編集後の内容が表示されること', :focus => true do
+      it 'Taskを編集した場合、一覧画面で編集後の内容が表示されること', :focus => false do
         # FIXME: テストが失敗するので修正してください 
         project = FactoryBot.create(:project)
         task = FactoryBot.create(:task, project_id: project.id)
         visit edit_project_task_path(project, task)
         fill_in 'Deadline', with: Time.current
         click_button 'Update Task'
-        byebug
-        #click_link 'Back'
-        #click_link "/projects/#{project.id}/tasks"
+        click_link 'Back'
         save_and_open_page
         expect(find('#task_list')).to have_content(Time.current.strftime('%Y-%m-%d'))
         expect(current_path).to eq project_tasks_path(project)
@@ -106,13 +104,15 @@ RSpec.describe 'Task', type: :system do
   describe 'Task削除' do
     context '正常系' do
       # FIXME: テストが失敗するので修正してください
-      xit 'Taskが削除されること' do
+      it 'Taskが削除されること', :focus => true do
         project = FactoryBot.create(:project)
         task = FactoryBot.create(:task, project_id: project.id)
         visit project_tasks_path(project)
-        click_link 'Destroy'
-        page.driver.browser.switch_to.alert.accept
-        expect(page).not_to have_content task.title
+        # 確認タイアログを実行するコード
+        accept_confirm do
+          click_link 'Destroy'
+        end
+        expect(page).not_to have_selector '#task_list', text: task.title 
         expect(Task.count).to eq 0
         expect(current_path).to eq project_tasks_path(project)
       end
