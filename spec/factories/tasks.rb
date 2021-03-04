@@ -6,7 +6,7 @@ FactoryBot.define do
     to   = Date.parse("2019/12/31")
     deadline { Random.rand(from..to) }
 
-    trait :status_due do
+    trait :status_due_and_complation_yesterday do
       status { :done }
       completion_date { Time.current.yesterday }
     end

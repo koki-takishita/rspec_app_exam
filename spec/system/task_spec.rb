@@ -81,7 +81,7 @@ RSpec.describe 'Task', type: :system do
 
       it '既にステータスが完了のタスクのステータスを変更した場合、Taskの完了日が更新されないこと' do
         # TODO: FactoryBotのtraitを利用してください
-        done_task = create(:task, :status_due, project_id: project.id)
+        done_task = create(:task, :status_due_and_complation_yesterday, project_id: project.id)
         visit edit_project_task_path(project, done_task)
         select 'todo', from: 'Status'
         click_button 'Update Task'
