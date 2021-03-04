@@ -28,7 +28,6 @@ RSpec.describe 'Task', type: :system do
   end
 
   describe 'Task新規作成' do
-    let(:project) { create(:project) }
     context '正常系' do
       it 'Taskが新規作成されること' do
         # TODO: ローカル変数ではなく let を使用してください
