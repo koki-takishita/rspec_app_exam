@@ -7,7 +7,7 @@ FactoryBot.define do
     deadline { Random.rand(from..to) }
     association :project
 
-    trait :status_due_and_complation_yesterday do
+    trait :status_done_complation_data_yesterday do
       status { :done }
       completion_date { Time.current.yesterday }
     end
